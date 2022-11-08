@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simon says</title>
+
+    <style>
+
+        #squares{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            max-width: 500px;
+            max-height: 500px;
+
+        }
+        .square{
+            border: 1px solid black;
+            width: 200px;
+            height: 200px;
+            margin: 10px;
+            
+        }
+
+        #red{
+            background-color: red;
+        }
+        #blue{
+            background-color: blue;
+        }
+        #green{
+            background-color: green;
+        }
+        #yellow{
+            background-color: yellow;
+        }
+    </style>
+
+    
+</head>
+<body>
+    <div id="page">
+        <div id="roundDiv"><p>Round: 1</p></div>
+        <div id="squares">
+            <div class="square" id="red" onclick="clickOnSquare(this)"></div>
+            <div class="square" id="blue" onclick="clickOnSquare(this)"></div>
+            <div class="square" id="green" onclick="clickOnSquare(this)"></div>
+            <div class="square" id="yellow" onclick="clickOnSquare(this)"></div>
+        </div>
+        <button onclick="startGame()">Start/restart game</button>
+        
+        <div id="outputDiv"></div>
+
+    </div>
+
+    <script> //Først er oppgaven løst uten MVC. MVC kommer i en senere utgave...
+            //Jeg beklager i noen tilfeller dårlige variabelnavn..
+
+        const colorArray = ['red', 'blue', 'green', 'yellow'];
+        let clickedArray = [];
+        let blinkedArray = [];
+
+        let timesClicked = 0;
+        let timesToBlink = 1;
+
+        let points = 0;
+
+        function resetArrays(){
+            console.log("Resetting arrrays...");
+            clickedArray = [];
+            blinkedArray = [];
+
+        }
+
+        function checkIfArraysAreTheSame(){
+            for(let i = 0; i < blinkedArray.length; i++){
+                if(clickedArray[i] != blinkedArray[i]){     
+                    console.log("Du har klikket feil!!");
+                    return false;
+                    
+                } 
+            }
+            console.log(clickedArray);
+            console.log(blinkedArray);
+            console.log("Du har klikket riktig!");
+            return true;
+
+
+        }
+
+
+        
+
+        function clickOnSquare(tagElement){
+            let colorId = tagElement.id;
+            console.log(tagElement.id + " is clicked!");
+            clickedArray.push(colorId);
+
+            timesClicked++;
+            if(timesClicked >= timesToBlink ){
+                console.log("Enough clicks are clicked!");
+                timesClicked = 0;
+                clickIsFinished();
+                resetArrays();
+
+            }
+            
+
+        }
+
+        function clickIsFinished(){
+
+            
+            //sammenligne arrayene
+            if(checkIfArraysAreTheSame()){
+                points++;
+
+            }
+            else {
+                points --;
+            }
+            timesToBlink++;
+            createOutput();
+            
+            setTimeout(blinkManyTimes, (1000), timesToBlink);
+
+
+        }
+
+       
+
+        function startGame(){
+            timesClicked = 0;
+            timesToBlink = 1;
+            points = 0;
+
+            createOutput();
+
+            resetArrays();
+            blinkManyTimes(timesToBlink);
+
+
+
+        }
+
+       
+        
+        function blinkManyTimes(timesToBlink_){
+            
+            for(let i = 0; i < timesToBlink_; i++){
+                
+                setTimeout(blinkSquare, (i * 1000), getRandomIndex());
+                
+            }
+
+        }
+
+        function blinkSquare(index){
+            
+            colorOff(index);
+            setTimeout(colorOn, 500, index);
+            blinkedArray.push(colorArray[index]);
+
+
+            
+        }
+
+        function colorOff(index){
+            let blinkingSquare = document.getElementById(colorArray[index]);
+            blinkingSquare.style.backgroundColor = 'white';
+
+        }
+        function colorOn(index){
+            let blinkingSquare = document.getElementById(colorArray[index]);
+            blinkingSquare.style.backgroundColor = colorArray[index];
+
+        }
+
+
+        function getRandomIndex(){
+            return getRandomNumber(0,3);
+        }
+
+        
+        
+        function getRandomNumber(min, max){
+            return min + Math.floor(Math.random() *  (max - min + 1));
+
+        }
+
+        function createOutput(){
+            outputEl = document.getElementById('outputDiv');
+            roundEl = document.getElementById('roundDiv');
+
+            roundEl.innerHTML = /*HTML*/`<p>Round: ${timesToBlink}</p>`;
+            outputEl.innerHTML = /*HTML*/`<p>Poeng: ${points}</p>`;
+        }
+
+
+        
+    </script>
+    
+</body>
+</html>
